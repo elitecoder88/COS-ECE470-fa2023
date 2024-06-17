@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use sha2::{Sha256, Digest};
 
 // 20-byte address
 #[derive(Eq, PartialEq, Serialize, Deserialize, Clone, Hash, Default, Copy)]
@@ -48,7 +49,12 @@ impl std::fmt::Debug for Address {
 
 impl Address {
     pub fn from_public_key_bytes(bytes: &[u8]) -> Address {
-        unimplemented!()
+        let mut hasher = Sha256::new();
+        hasher.update(bytes);
+        let result = hasher.finalize();
+        let mut address_bytes = [0u8; 20];
+        address_bytes.copy_from_slice(&result[12..32]);
+        Address(address_bytes)
     }
 }
 // DO NOT CHANGE THIS COMMENT, IT IS FOR AUTOGRADER. BEFORE TEST
